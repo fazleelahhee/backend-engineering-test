@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
+use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * AuthController
+ */
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    /**
+     * register
+     *
+     * @param  RegisterRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(RegisterRequest $request): \Illuminate\Http\JsonResponse
     {
         $user = User::create([
             'name' => $request->name,
@@ -22,13 +31,18 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()
-            ->json(['data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
+            ->json(['data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ], 201);
     }
 
-    public function login(Request $request)
+    /**
+     * login
+     *
+     * @param  LoginRequest $request
+     * @return Illuminate\Http\JsonResponse
+     */
+    public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
-        if (!Auth::attempt($request->only('email', 'password')))
-        {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             return response()
                 ->json(['message' => 'Unauthorized'], 401);
         }
@@ -41,12 +55,18 @@ class AuthController extends Controller
             ->json(['message' => "Authetication success",'access_token' => $token, 'token_type' => 'Bearer', ]);
     }
 
-    public function logout()
+    /**
+     * logout
+     *
+     * @return Illuminate\Http\JsonResponse
+     */
+    public function logout(): \Illuminate\Http\JsonResponse
     {
         auth()->user()->tokens()->delete();
 
-        return [
+        return response()
+        ->json([
             'message' => 'You have successfully logged out and the token was successfully deleted'
-        ];
+        ]);
     }
 }

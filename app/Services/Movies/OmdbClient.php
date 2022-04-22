@@ -3,55 +3,99 @@
 namespace App\Services\Movies;
 
 use App\Services\Movies\Contracts\MovieContract;
+use Exception;
 use Illuminate\Support\Facades\Http;
 
-class OmdbClient implements MovieContract {
+class OmdbClient implements MovieContract
+{
+    /**
+     * API URI
+     *
+     * @var string
+     */
     protected string $uri;
+
+    /**
+     * API Key
+     *
+     * @var string
+     */
     protected string $key;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     private array $queryParams = [
         "plot" => "full",
         "type" => "movie",
     ];
-    
-    public function __construct( string $uri, string $key)
+
+
+    /**
+     * __construct
+     *
+     * @param  mixed $uri
+     * @param  mixed $key
+     * @return void
+     */
+    public function __construct(string $uri, string $key)
     {
         $this->uri = $uri;
         $this->key = $key;
     }
 
-    public function movie($params= [])
+    /**
+     * movie
+     *
+     * @param  mixed $params
+     * @return array
+     */
+    public function movie(array $params = []): array
     {
         $response = Http::get("{$this->uri}?" . $this->getQueryParams($params));
 
         if (! $response->successful()) {
             return $response->toException();
         }
- 
+
         return $this->responseFormatter($response->json());
     }
 
-    protected function getQueryParams ($params = []): string {
+    /**
+     * getQueryParams
+     *
+     * @param  array $params
+     * @return string
+     */
+    protected function getQueryParams(array $params = []): string
+    {
         $this->queryParams['apikey'] = $this->key;
-        
-        if(!empty($params['title'])) {
+
+        if (!empty($params['title'])) {
             $this->queryParams['t'] = $params['title'];
         }
 
-        if(!empty($params['year'])) {
+        if (!empty($params['year'])) {
             $this->queryParams['y'] = $params['year'];
         }
 
         return http_build_query($this->queryParams);
     }
 
-    protected function responseFormatter($data) {
+    /**
+     * responseFormatter
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function responseFormatter(array $data): array
+    {
         $output = [];
-        foreach($data as $key=>$value) {
+        foreach ($data as $key => $value) {
             $output[strtolower($key)] = $value;
         }
         return $output;
     }
-
-
 }

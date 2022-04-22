@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MovieRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,8 @@ class MovieRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'string|max:255',
-            'actor' => 'string|max:255',
-            'year'  => 'numeric'
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:8'
         ];
     }
 }

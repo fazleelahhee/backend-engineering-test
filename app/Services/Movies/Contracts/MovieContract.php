@@ -1,6 +1,13 @@
 <?php
+
 namespace App\Services\Movies\Contracts;
 
-interface MovieContract {
+interface MovieContract
+{
+    /**
+     * movie
+     *
+     * @return void
+     */
     public function movie();
 }
